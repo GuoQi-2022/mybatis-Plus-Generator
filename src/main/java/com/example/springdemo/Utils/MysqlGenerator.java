@@ -17,14 +17,9 @@ import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.TemplateConfig;
 import com.baomidou.mybatisplus.generator.config.TemplateType;
-import com.baomidou.mybatisplus.generator.config.builder.Controller;
-import com.baomidou.mybatisplus.generator.config.builder.Entity;
-import com.baomidou.mybatisplus.generator.config.builder.Mapper;
-import com.baomidou.mybatisplus.generator.config.builder.Service;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
-import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.fill.Property;
 
@@ -51,104 +46,152 @@ public class MysqlGenerator {
         }
         throw new MybatisPlusException("请输入正确的" + tip + "!");
     }
-
+    //全局配置
+    /* ***************************项目地址（绝对地址，如：D://PROJECT/Demo/）*********************************** */
+    static String projectPath = "D:\\StudayWorkspaces\\mybatis-Plus-Generator";
+    final static String outputDir = projectPath + "\\src\\main";
     public static void main(String[] args) {
+        /**
+        * 使用Freemarker引擎模板，默认的是Velocity引擎模板 FreemarkerTemplateEngine VelocityTemplateEngine
+        */
+        FastAutoGenerator.create(getDataSource())
+            .globalConfig(MysqlGenerator::setGlobalConfig)
+            .packageConfig(MysqlGenerator::setPackageConfig)
+            .strategyConfig(MysqlGenerator::setStrategyConfig)
+            .strategyConfig(MysqlGenerator::setEntityConfig)
+            .strategyConfig(MysqlGenerator::setControllerConfig)
+            .strategyConfig(MysqlGenerator::setServiceConfig)
+            .strategyConfig(MysqlGenerator::setMapperConfig)
+            .injectionConfig(MysqlGenerator::setInjectionConfig)
+            .templateConfig(MysqlGenerator::setTemplateConfig)
+            .templateEngine(new FreemarkerTemplateEngine())
+            .execute();
+    }
 
-        //全局配置
-        /* ***************************项目地址（绝对地址，如：D://PROJECT/Demo/）*********************************** */
-        String projectPath = "D://workspaces//mybatis-Plus-Generator";
-        GlobalConfig.Builder globalConfig = new GlobalConfig.Builder().outputDir(projectPath + "/src/main/java")
-            .author("郭旗")
-            .disableOpenDir()//禁止打开输出目录
-            .fileOverride()
-            .dateType(DateType.TIME_PACK)//时间类型对应策略
-            .commentDate("yyyy-MM-dd");
-        final String outputDir = globalConfig.build().getOutputDir();
-        /* 包配置 */
-        final PackageConfig.Builder packageConfig = new PackageConfig.Builder()
-            .parent("com.example.mybatisG")
-            .moduleName("demo")
-            .entity("entity")
-            .service("service")
-            .serviceImpl("service.impl")
-            .mapper("mapper")
-            .xml("mapper.xml")
-            .controller("controller")
-            .pathInfo(Collections.singletonMap(OutputFile.xml, outputDir));
-
-        final CustomFile.Builder dto = new CustomFile.Builder()
-            .fileName("DTO.java")
-            .templatePath("/templates/dto.java.vm")
-            .packageName("dto");
-        final InjectionConfig.Builder injectionConfig = new InjectionConfig.Builder()
+    /**
+     * 注入配置设置
+     */
+    private static void setInjectionConfig(InjectionConfig.Builder builder) {
+        builder
             .beforeOutputFile((tableInfo, objectMap) -> {
                 System.out.println("tableInfo: " + tableInfo.getEntityName() + " objectMap: " + objectMap.size());
             })
-            .customMap(Collections.singletonMap("test", "baomidou"))
-            .customFile(Collections.singletonMap("DTO.java", "/templates/dto.java.vm"))
-        //            .customFile(dto.build())
-        ;
-
-        final TemplateConfig.Builder templateConfig = new TemplateConfig.Builder().disable(TemplateType.ENTITY)
-            .entity(ConstVal.TEMPLATE_ENTITY_JAVA)
-            .service(ConstVal.TEMPLATE_SERVICE)
-            .serviceImpl(ConstVal.TEMPLATE_SERVICE_IMPL)
-            .mapper(ConstVal.TEMPLATE_MAPPER)
-            .xml(ConstVal.TEMPLATE_XML)
-            .controller(ConstVal.TEMPLATE_CONTROLLER);
-
-        final Entity.Builder entityConfig = new StrategyConfig.Builder().entityBuilder()
-            .naming(NamingStrategy.underline_to_camel)
-            .columnNaming(NamingStrategy.underline_to_camel)
-            .disableSerialVersionUID()
-            .enableChainModel()
-            .enableLombok()
-            .enableRemoveIsPrefix()//开启Boolean类型字段移除is前缀
-            .enableTableFieldAnnotation()
-            .enableActiveRecord()//?
-            .addTableFills(new Column("create_time", FieldFill.INSERT))
-            .addTableFills(new Property("updateTime", FieldFill.INSERT_UPDATE)).idType(IdType.AUTO)
-            .formatFileName("%sEntity");
-
-        final Mapper.Builder mapperConfig = new StrategyConfig.Builder()
-            .mapperBuilder()
-            .superClass(tk.mybatis.mapper.common.Mapper.class)
-            .enableMapperAnnotation()
-            .enableBaseResultMap()
-            .enableBaseColumnList().formatMapperFileName("%sMapper")
-            .formatXmlFileName("%sMapper");
-        final StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder()
-//            .enableCapitalMode()
-            .enableSkipView()
-//          .disableSqlFilter()
-//          .addInclude(scanner().split(",")) // 设置需要生成的表名
-            .addInclude("tb_yx_history_record") // 设置需要生成的表名
-            .addTablePrefix("tb_yx_", "TB_YX_")
+            .fileOverride()
+//          .customMap(Collections.singletonMap("test", "baomidou"))
             ;
+    }
 
-        final Controller.Builder controllerConfig = new StrategyConfig.Builder()
-            .controllerBuilder()
-            .enableHyphenStyle()
-            .enableRestStyle()
-            .formatFileName("%sAction");
+    /**
+     * Mapper设置
+     */
+    private static void setMapperConfig(StrategyConfig.Builder builder) {
+        builder
+                .mapperBuilder()
+                .fileOverride()
+                .superClass(ConstVal.SUPER_MAPPER_CLASS)
+                .enableMapperAnnotation()
+                .formatMapperFileName("%sMapper")
+                .formatXmlFileName("%sMapper");
+    }
 
-        final Service.Builder serviceConfig = new StrategyConfig.Builder()
-            .serviceBuilder()
-            .formatServiceFileName("%sService")
-            .formatServiceImplFileName("%sServiceImp");
+    /**
+     * Service设置
+     */
+    private static void setServiceConfig(StrategyConfig.Builder builder) {
+        builder
+                .serviceBuilder()
+                .fileOverride()
+                .formatServiceFileName("%sService")
+//                .superServiceClass(ConstVal.SUPER_SERVICE_CLASS)
+                .superServiceImplClass(ConstVal.SUPER_SERVICE_IMPL_CLASS)
+                .formatServiceImplFileName("%sServiceImp")
+        ;
+    }
 
-        FastAutoGenerator.create(getDataSource())
-            .globalConfig(builder -> globalConfig.build())
-            .packageConfig(builder -> packageConfig.build())
-            .strategyConfig(builder -> strategyConfig.build())
-            .strategyConfig(builder -> entityConfig.build())
-            .strategyConfig(builder -> controllerConfig.build())
-            .strategyConfig(builder -> serviceConfig.build())
-            .strategyConfig(builder -> mapperConfig.build())
-            .injectionConfig(builder -> injectionConfig.build())
-            .templateConfig(builder -> templateConfig.build())
-            .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板 FreemarkerTemplateEngine VelocityTemplateEngine
-            .execute();
+    /**
+     * Controller设置
+     */
+    private static void setControllerConfig(StrategyConfig.Builder builder) {
+        builder
+                .controllerBuilder()
+                .fileOverride()
+                .enableHyphenStyle()
+                .enableRestStyle()
+                .formatFileName("%sAction");
+    }
+
+    /**
+     * Entity设置
+     */
+    private static void setEntityConfig(StrategyConfig.Builder builder) {
+        builder
+                .entityBuilder()
+                .fileOverride()
+                .naming(NamingStrategy.underline_to_camel)
+                .columnNaming(NamingStrategy.underline_to_camel)
+                .disableSerialVersionUID()
+                .enableChainModel()
+                .enableLombok()
+                .enableRemoveIsPrefix()//开启Boolean类型字段移除is前缀
+                .enableTableFieldAnnotation()
+                .enableActiveRecord()//?
+                .addTableFills(new Column("create_time", FieldFill.INSERT))
+                .addTableFills(new Property("updateTime", FieldFill.INSERT_UPDATE)).idType(IdType.AUTO)
+                .formatFileName("%sEntity");
+    }
+    /**
+     * 路径配置
+     */
+    private static void setPackageConfig(PackageConfig.Builder builder) {
+        builder
+                .parent("com.example.mybatisG")
+                .moduleName("demo")
+                .entity("entity")
+                .service("service")
+                .serviceImpl("service.impl")
+                .mapper("mapper")
+                .xml("mapper.xml")
+                .controller("controller")
+                .pathInfo(Collections.singletonMap(OutputFile.xml, outputDir+"\\resources\\mapper"));
+    }
+
+    /**
+     * 结果文件路径设置
+     */
+    private static void setGlobalConfig(GlobalConfig.Builder builder) {
+        builder
+                .outputDir(outputDir+"\\java")
+                .author("郭旗")
+                .disableOpenDir()//禁止打开输出目录（禁止生成后打开文件夹）
+                .fileOverride()
+                .dateType(DateType.TIME_PACK)//时间类型对应策略
+                .commentDate("yyyy-MM-dd");
+    }
+
+    /**
+     * 模板类型设置
+     */
+    private static void setTemplateConfig(TemplateConfig.Builder builder) {
+        builder.disable(TemplateType.ENTITY)
+                .entity(ConstVal.TEMPLATE_ENTITY_JAVA)
+                .service(ConstVal.TEMPLATE_SERVICE)
+                .serviceImpl(ConstVal.TEMPLATE_SERVICE_IMPL)
+                .mapper(ConstVal.TEMPLATE_MAPPER)
+                .xml(ConstVal.TEMPLATE_XML)
+                .controller(ConstVal.TEMPLATE_CONTROLLER);
+    }
+
+    /**
+     * 表设置
+     */
+    private static void setStrategyConfig(StrategyConfig.Builder builder) {
+        builder
+    //  .enableCapitalMode()
+    //  .disableSqlFilter()
+    //  .addInclude(scanner().split(",")) // 设置需要生成的表名
+        .enableSkipView()
+        .addInclude("tb_yx_history_record") // 设置需要生成的表名
+        .addTablePrefix("tb_yx_", "TB_YX_");
     }
 
     /**

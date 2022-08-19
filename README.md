@@ -6,7 +6,7 @@ Maven
 <dependency>
     <groupId>com.baomidou</groupId>
     <artifactId>mybatis-plus-generator</artifactId>
-    <version>Latest Version</version>
+    <version>3.5.2</version>
 </dependency>
 ```
 [generator 版本查询](https://search.maven.org/search?q=a:mybatis-plus-generator)

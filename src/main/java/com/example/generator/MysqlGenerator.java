@@ -1,4 +1,4 @@
-package com.example.springdemo.Utils;
+package com.example.generator;
 
 import java.util.Collections;
 import java.util.Scanner;
@@ -22,8 +22,7 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.fill.Property;
-
-import lombok.Builder;
+import com.example.generator.Utils.ConstVal;
 
 /**
  * @author gq
@@ -155,7 +154,7 @@ public class MysqlGenerator {
     private static void setGlobalConfig(GlobalConfig.Builder builder) {
         builder
                 .outputDir(outputDir + "\\java")
-                .author("郭旗")
+                .author("Gq")
                 .disableOpenDir()//禁止打开输出目录（禁止生成后打开文件夹）
                 .dateType(DateType.TIME_PACK)
                 .commentDate("yyyy-MM-dd");
@@ -189,7 +188,6 @@ public class MysqlGenerator {
     /**
      * 数据源配置
      */
-    @Builder
     private static DataSourceConfig.Builder getDataSource() {
         return new DataSourceConfig.Builder(
             "jdbc:mysql://localhost:3306/testDemo?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC",

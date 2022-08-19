@@ -30,6 +30,11 @@ import lombok.Builder;
  * @date 2020/11/6 14:24
  */
 public class MysqlGenerator {
+    //全局配置
+    /* ***************************项目地址（绝对地址，如：D:\\PROJECT\\Demo）*********************************** */
+    static String projectPath = "D:\\StudayWorkspaces\\mybatis-Plus-Generator";
+    final static String outputDir = projectPath + "\\src\\main";
+
     /**
      * 运行后在控制台输入数据库中的需要生成相应代码的表的表名（多张表用“，”隔开）
      */
@@ -46,26 +51,24 @@ public class MysqlGenerator {
         }
         throw new MybatisPlusException("请输入正确的" + tip + "!");
     }
-    //全局配置
-    /* ***************************项目地址（绝对地址，如：D://PROJECT/Demo/）*********************************** */
-    static String projectPath = "D:\\StudayWorkspaces\\mybatis-Plus-Generator";
-    final static String outputDir = projectPath + "\\src\\main";
+
     public static void main(String[] args) {
         /**
-        * 使用Freemarker引擎模板，默认的是Velocity引擎模板 FreemarkerTemplateEngine VelocityTemplateEngine
-        */
-        FastAutoGenerator.create(getDataSource())
-            .globalConfig(MysqlGenerator::setGlobalConfig)
-            .packageConfig(MysqlGenerator::setPackageConfig)
-            .strategyConfig(MysqlGenerator::setStrategyConfig)
-            .strategyConfig(MysqlGenerator::setEntityConfig)
-            .strategyConfig(MysqlGenerator::setControllerConfig)
-            .strategyConfig(MysqlGenerator::setServiceConfig)
-            .strategyConfig(MysqlGenerator::setMapperConfig)
-            .injectionConfig(MysqlGenerator::setInjectionConfig)
-            .templateConfig(MysqlGenerator::setTemplateConfig)
-            .templateEngine(new FreemarkerTemplateEngine())
-            .execute();
+         * 使用Freemarker引擎模板，默认的是Velocity引擎模板 FreemarkerTemplateEngine VelocityTemplateEngine
+         */
+        FastAutoGenerator
+                .create(getDataSource())
+                .globalConfig(MysqlGenerator::setGlobalConfig)
+                .packageConfig(MysqlGenerator::setPackageConfig)
+                .strategyConfig(MysqlGenerator::setStrategyConfig)
+                .strategyConfig(MysqlGenerator::setEntityConfig)
+                .strategyConfig(MysqlGenerator::setControllerConfig)
+                .strategyConfig(MysqlGenerator::setServiceConfig)
+                .strategyConfig(MysqlGenerator::setMapperConfig)
+                .injectionConfig(MysqlGenerator::setInjectionConfig)
+                .templateConfig(MysqlGenerator::setTemplateConfig)
+                .templateEngine(new FreemarkerTemplateEngine())
+                .execute();
     }
 
     /**
@@ -73,12 +76,9 @@ public class MysqlGenerator {
      */
     private static void setInjectionConfig(InjectionConfig.Builder builder) {
         builder
-            .beforeOutputFile((tableInfo, objectMap) -> {
-                System.out.println("tableInfo: " + tableInfo.getEntityName() + " objectMap: " + objectMap.size());
-            })
-            .fileOverride()
-//          .customMap(Collections.singletonMap("test", "baomidou"))
-            ;
+                .beforeOutputFile((tableInfo, objectMap) ->
+                        System.out.println("tableInfo: " + tableInfo.getEntityName() + " objectMap: " + objectMap.size()))
+                .fileOverride();
     }
 
     /**
@@ -102,10 +102,9 @@ public class MysqlGenerator {
                 .serviceBuilder()
                 .fileOverride()
                 .formatServiceFileName("%sService")
-//                .superServiceClass(ConstVal.SUPER_SERVICE_CLASS)
+                .superServiceClass(ConstVal.SUPER_SERVICE_CLASS)
                 .superServiceImplClass(ConstVal.SUPER_SERVICE_IMPL_CLASS)
-                .formatServiceImplFileName("%sServiceImp")
-        ;
+                .formatServiceImplFileName("%sServiceImpl");
     }
 
     /**
@@ -115,9 +114,7 @@ public class MysqlGenerator {
         builder
                 .controllerBuilder()
                 .fileOverride()
-                .enableHyphenStyle()
-                .enableRestStyle()
-                .formatFileName("%sAction");
+                .enableRestStyle();
     }
 
     /**
@@ -130,29 +127,26 @@ public class MysqlGenerator {
                 .naming(NamingStrategy.underline_to_camel)
                 .columnNaming(NamingStrategy.underline_to_camel)
                 .disableSerialVersionUID()
-                .enableChainModel()
                 .enableLombok()
-                .enableRemoveIsPrefix()//开启Boolean类型字段移除is前缀
-                .enableTableFieldAnnotation()
-                .enableActiveRecord()//?
                 .addTableFills(new Column("create_time", FieldFill.INSERT))
-                .addTableFills(new Property("updateTime", FieldFill.INSERT_UPDATE)).idType(IdType.AUTO)
+                .addTableFills(new Property("updateTime", FieldFill.INSERT_UPDATE))
+                .idType(IdType.AUTO)
                 .formatFileName("%sEntity");
     }
+
     /**
      * 路径配置
      */
     private static void setPackageConfig(PackageConfig.Builder builder) {
         builder
                 .parent("com.example.mybatisG")
-                .moduleName("demo")
                 .entity("entity")
                 .service("service")
                 .serviceImpl("service.impl")
                 .mapper("mapper")
                 .xml("mapper.xml")
                 .controller("controller")
-                .pathInfo(Collections.singletonMap(OutputFile.xml, outputDir+"\\resources\\mapper"));
+                .pathInfo(Collections.singletonMap(OutputFile.xml, outputDir + "\\resources\\mapper"));
     }
 
     /**
@@ -160,11 +154,10 @@ public class MysqlGenerator {
      */
     private static void setGlobalConfig(GlobalConfig.Builder builder) {
         builder
-                .outputDir(outputDir+"\\java")
+                .outputDir(outputDir + "\\java")
                 .author("郭旗")
                 .disableOpenDir()//禁止打开输出目录（禁止生成后打开文件夹）
-                .fileOverride()
-                .dateType(DateType.TIME_PACK)//时间类型对应策略
+                .dateType(DateType.TIME_PACK)
                 .commentDate("yyyy-MM-dd");
     }
 
@@ -172,7 +165,8 @@ public class MysqlGenerator {
      * 模板类型设置
      */
     private static void setTemplateConfig(TemplateConfig.Builder builder) {
-        builder.disable(TemplateType.ENTITY)
+        builder
+                .disable(TemplateType.ENTITY)
                 .entity(ConstVal.TEMPLATE_ENTITY_JAVA)
                 .service(ConstVal.TEMPLATE_SERVICE)
                 .serviceImpl(ConstVal.TEMPLATE_SERVICE_IMPL)
@@ -186,12 +180,10 @@ public class MysqlGenerator {
      */
     private static void setStrategyConfig(StrategyConfig.Builder builder) {
         builder
-    //  .enableCapitalMode()
-    //  .disableSqlFilter()
-    //  .addInclude(scanner().split(",")) // 设置需要生成的表名
-        .enableSkipView()
-        .addInclude("tb_yx_history_record") // 设置需要生成的表名
-        .addTablePrefix("tb_yx_", "TB_YX_");
+                .addInclude(scanner()
+                .split(",")) // 设置需要生成的表名
+            //  .addInclude("tb_yx_history_record") // 设置需要生成的表名
+                .addTablePrefix("tb_yx_", "TB_YX_");
     }
 
     /**
